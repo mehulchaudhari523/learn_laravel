@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Http\Response;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Lang;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -41,4 +43,25 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    // Get Auth Token
+    public function getAuthToken($request)
+    {
+        $response = [];
+        try {
+            $tokenName = config('constants.TOKEN_NAME');
+            $credentials = $request->only('email', 'password');
+            if (Auth::attempt($credentials)) {
+                $token = $request->user()->createToken($tokenName);
+                $response = successResponse(Lang::get('messages.success'), [
+                    'token' => $tokenName . ' ' . $token->plainTextToken,
+                ]);
+            } else {
+                $response = customResponse(Response::HTTP_UNAUTHORIZED, Lang::get('messages.unauthorized'), []);
+            }
+        } catch (\Exception $ex) {
+            $response = serverErrorResponse($ex->getMessage());
+        }
+        return $response;
+    }
 }
