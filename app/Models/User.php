@@ -49,18 +49,19 @@ class User extends Authenticatable
     {
         $response = [];
         try {
+            dd(slug());
             $tokenName = config('constants.TOKEN_NAME');
             $credentials = $request->only('email', 'password');
             if (Auth::attempt($credentials)) {
                 $token = $request->user()->createToken($tokenName);
-                $response = successResponse(Lang::get('messages.success'), [
+                $response = apiResponse(Response::HTTP_OK, Lang::get('messages.success'), [
                     'token' => $tokenName . ' ' . $token->plainTextToken,
                 ]);
             } else {
-                $response = customResponse(Response::HTTP_UNAUTHORIZED, Lang::get('messages.unauthorized'), []);
+                $response = apiResponse(Response::HTTP_UNAUTHORIZED, Lang::get('messages.unauthorized'));
             }
         } catch (\Exception $ex) {
-            $response = serverErrorResponse($ex->getMessage());
+            $response = apiResponse(Response::HTTP_INTERNAL_SERVER_ERROR, $ex->getMessage());
         }
         return $response;
     }

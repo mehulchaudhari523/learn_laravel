@@ -4,6 +4,8 @@ namespace App\Http\Controllers\ApiControllers;
 
 use App\Http\Controllers\ApiController;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Lang;
 
 class FirstController extends ApiController
 {
@@ -12,10 +14,10 @@ class FirstController extends ApiController
     {
         $response = [];
         try {
-            $response = successResponse('success', []);
+            $response = apiResponse(Response::HTTP_OK, Lang::get('messages.success'));
         } catch (\Exception $ex) {
-            $response = serverErrorResponse($ex->getMessage());
+            $response = apiResponse(Response::HTTP_INTERNAL_SERVER_ERROR, $ex->getMessage());
         }
-        return $this->apiResponse($response);
+        return sendResponse($response);
     }
 }
