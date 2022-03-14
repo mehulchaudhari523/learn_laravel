@@ -2,37 +2,32 @@
 
 use Illuminate\Http\Response;
 
-// Check Success Response Function Already Exist
+// Check API Response Function Exist
 if (!function_exists('successResponse')) {
-    function successResponse($message, $result)
+    function apiResponse($status, $message, $result = [], $otherData = [])
     {
-        return [
-            'status' => Response::HTTP_OK,
-            'message' => $message,
-            'result' => $result,
-        ];
+        $response['status'] = $status;
+        $response['message'] = $message;
+        $response['result'] = $result;
+        if (!empty($other)) {
+            $response['otherData'] = $otherData;
+        }
+        return $response;
     }
 }
 
-// Check Server Error Response Function Already Exist
-if (!function_exists('serverErrorResponse')) {
-    function serverErrorResponse($message)
+// Check Send Response Function Exist
+if (!function_exists('sendResponse')) {
+    function sendResponse($response)
     {
-        return [
-            'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
-            'message' => $message,
-        ];
+        return response()->json($response, $response['status']);
     }
 }
 
-// Check Server Error Response Function Already Exist
-if (!function_exists('customResponse')) {
-    function customResponse($status, $message, $result)
+// Check Slug Function Exist
+if (!function_exists('slug')) {
+    function slug()
     {
-        return [
-            'status' => $status,
-            'message' => $message,
-            'result' => $result,
-        ];
+        return substr(str_shuffle(config('constants.SUFFLE_STR')), 1, config('constants.SLUG_LENGTH'));
     }
 }
